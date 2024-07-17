@@ -184,21 +184,7 @@ namespace Windows_Tools
 
         private void GetKMSServerList()
         {            
-            WebClient webClient = new WebClient();
-            webClient.Encoding = Encoding.UTF8;
-            try
-            {
-                string serverlist = webClient.DownloadString("http://124.222.212.219/serverlist.txt");
-                string[] serverlist_array = serverlist.Split('\n');
-                foreach (string server in serverlist_array)
-                {
-                    Choose_KMS_Server_ComboBox.Items.Add(server);
-                }
-            }
-            catch
-            {
-                MessageBox.Show("获取 KMS 服务器列表失败，请检查网络连接。", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            
         }
 
 
@@ -289,7 +275,21 @@ namespace Windows_Tools
 
         private void Spw_Code_Click(object sender, EventArgs e)
         {
-            
+            StringBuilder serialNumber = new StringBuilder();
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < GroupSize; j++)
+                {
+                    serialNumber.Append(ValidCharacters[random.Next(ValidCharacters.Length)]);
+                }
+                if (i < 4)
+                {
+                    serialNumber.Append('-');
+                }
+            }
+
+            Code_TextBox.Text = serialNumber.ToString();
+            Start_Activation_Button.Enabled = true;
 
             // 如果按下 Alt 键的同时点击 Spw_Code 按钮，则将 Code_TextBox 中的内容复制到剪贴板。
             if (ModifierKeys == Keys.Alt)
