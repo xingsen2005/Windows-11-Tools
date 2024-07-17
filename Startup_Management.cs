@@ -24,5 +24,9 @@ namespace Windows_Tools
         {
 
         }
+        private void Startup_DataGridView_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

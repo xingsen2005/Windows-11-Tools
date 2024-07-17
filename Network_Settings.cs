@@ -28,9 +28,16 @@ namespace Windows_Tools
         {
             foreach (NetworkInterface nic in _networkInterfaces)
             {
-                Select_NIC_ComboBox.Items.Add(nic.Name);
+                // 排除环回地址
+                if (nic.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                {
+                    Select_NIC_ComboBox.Items.Add(nic.Name);
+                }
             }
-            Select_NIC_ComboBox.SelectedIndex = 0;
+            if (Select_NIC_ComboBox.Items.Count > 0)
+            {
+                Select_NIC_ComboBox.SelectedIndex = 0;
+            }
         }      
 
         private void Select_NIC_ComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -78,23 +85,9 @@ namespace Windows_Tools
             }
         }
 
-        private void Network_Settings_Load(object sender, EventArgs e)
-        {
-            // 创建ini配置文件到“C:\Users\当前用户\Documents”，文件名为“Windows11_Tolls_Network_Settings.ini”
-            // IniFile iniFile = new IniFile("C:\\Users\\" + Environment.UserName + "\\Documents\\Windows11_Tolls_Network_Settings.ini");
-        }
-
         private void Save_Button_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("修改 MAC 地址可能会导致网络出现问题，继续吗？", "修改 MAC 地址", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                // 将 Select_NIC_ComboBox 选中项的 MAC 地址修改为 MAC_Add_TextBox 的内容
-
-            }
-            else
-            {
-                return;
-            }
+            MessageBox.Show("此功能正在施工中……", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

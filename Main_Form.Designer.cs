@@ -31,9 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main_Window));
             this.Github_Pages_Button = new System.Windows.Forms.Button();
             this.System_GroupBox = new System.Windows.Forms.GroupBox();
-            this.Remove_Windows_Defender_CheckBox = new System.Windows.Forms.CheckBox();
             this.DateTimePicker = new System.Windows.Forms.DateTimePicker();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.Disable_SmartScreen_CheckBox = new System.Windows.Forms.CheckBox();
             this.Disable_UAC_CheckBox = new System.Windows.Forms.CheckBox();
             this.Disable_Firewall_CheckBox = new System.Windows.Forms.CheckBox();
@@ -54,8 +52,10 @@
             this.Re_Explorer = new System.Windows.Forms.Button();
             this.Clear_Disktop_Icon_Cache_Button = new System.Windows.Forms.Button();
             this.Disclaimer_Button = new System.Windows.Forms.Button();
-            this.Right_ClickMenuManagement_Button = new System.Windows.Forms.Button();
+            this.Right_ClickMenu_Management_Button = new System.Windows.Forms.Button();
             this.Network_Settings_Button = new System.Windows.Forms.Button();
+            this.Disable_Open_File_Waring_CheckBox = new System.Windows.Forms.CheckBox();
+            this.Remove_Windows_Defender_CheckBox = new System.Windows.Forms.CheckBox();
             this.System_GroupBox.SuspendLayout();
             this.Desktop_GroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -74,7 +74,7 @@
             // 
             this.System_GroupBox.Controls.Add(this.Remove_Windows_Defender_CheckBox);
             this.System_GroupBox.Controls.Add(this.DateTimePicker);
-            this.System_GroupBox.Controls.Add(this.checkBox1);
+            this.System_GroupBox.Controls.Add(this.Disable_Open_File_Waring_CheckBox);
             this.System_GroupBox.Controls.Add(this.Disable_SmartScreen_CheckBox);
             this.System_GroupBox.Controls.Add(this.Disable_UAC_CheckBox);
             this.System_GroupBox.Controls.Add(this.Disable_Firewall_CheckBox);
@@ -86,16 +86,6 @@
             this.System_GroupBox.TabStop = false;
             this.System_GroupBox.Text = "安全";
             // 
-            // Remove_Windows_Defender_CheckBox
-            // 
-            this.Remove_Windows_Defender_CheckBox.AutoSize = true;
-            this.Remove_Windows_Defender_CheckBox.Location = new System.Drawing.Point(13, 174);
-            this.Remove_Windows_Defender_CheckBox.Name = "Remove_Windows_Defender_CheckBox";
-            this.Remove_Windows_Defender_CheckBox.Size = new System.Drawing.Size(150, 16);
-            this.Remove_Windows_Defender_CheckBox.TabIndex = 26;
-            this.Remove_Windows_Defender_CheckBox.Text = "移除 Windows Defender";
-            this.Remove_Windows_Defender_CheckBox.UseVisualStyleBackColor = true;
-            // 
             // DateTimePicker
             // 
             this.DateTimePicker.Location = new System.Drawing.Point(145, 26);
@@ -105,16 +95,6 @@
             this.DateTimePicker.Size = new System.Drawing.Size(135, 21);
             this.DateTimePicker.TabIndex = 20;
             this.DateTimePicker.Value = new System.DateTime(2099, 12, 31, 0, 0, 0, 0);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(13, 145);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(168, 16);
-            this.checkBox1.TabIndex = 19;
-            this.checkBox1.Text = "关闭“打开文件安全警告”";
-            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // Disable_SmartScreen_CheckBox
             // 
@@ -195,9 +175,9 @@
             this.Restore_the_Context_Menu_CheckBox.AutoSize = true;
             this.Restore_the_Context_Menu_CheckBox.Location = new System.Drawing.Point(12, 145);
             this.Restore_the_Context_Menu_CheckBox.Name = "Restore_the_Context_Menu_CheckBox";
-            this.Restore_the_Context_Menu_CheckBox.Size = new System.Drawing.Size(120, 16);
+            this.Restore_the_Context_Menu_CheckBox.Size = new System.Drawing.Size(210, 16);
             this.Restore_the_Context_Menu_CheckBox.TabIndex = 24;
-            this.Restore_the_Context_Menu_CheckBox.Text = "恢复经典右键菜单";
+            this.Restore_the_Context_Menu_CheckBox.Text = "将右键菜单恢复为 Win10 经典样式";
             this.Restore_the_Context_Menu_CheckBox.UseVisualStyleBackColor = true;
             this.Restore_the_Context_Menu_CheckBox.CheckedChanged += new System.EventHandler(this.Restore_the_Context_Menu_CheckBox_CheckedChanged);
             // 
@@ -211,7 +191,6 @@
             this.Taskbar_Right_RadioButton.TabIndex = 23;
             this.Taskbar_Right_RadioButton.Text = "右边";
             this.Taskbar_Right_RadioButton.UseVisualStyleBackColor = true;
-            this.Taskbar_Right_RadioButton.CheckedChanged += new System.EventHandler(this.Taskbar_Right_RadioButton_CheckedChanged);
             // 
             // Taskbar_Left_RadioButton
             // 
@@ -223,7 +202,6 @@
             this.Taskbar_Left_RadioButton.TabIndex = 22;
             this.Taskbar_Left_RadioButton.Text = "左边";
             this.Taskbar_Left_RadioButton.UseVisualStyleBackColor = true;
-            this.Taskbar_Left_RadioButton.CheckedChanged += new System.EventHandler(this.Taskbar_Left_RadioButton_CheckedChanged);
             // 
             // Taskbar_Down_RadioButton
             // 
@@ -237,7 +215,6 @@
             this.Taskbar_Down_RadioButton.TabStop = true;
             this.Taskbar_Down_RadioButton.Text = "底部";
             this.Taskbar_Down_RadioButton.UseVisualStyleBackColor = true;
-            this.Taskbar_Down_RadioButton.CheckedChanged += new System.EventHandler(this.Taskbar_Down_RadioButton_CheckedChanged);
             // 
             // Taskbar_UP_RadioButton
             // 
@@ -249,7 +226,6 @@
             this.Taskbar_UP_RadioButton.TabIndex = 20;
             this.Taskbar_UP_RadioButton.Text = "顶部";
             this.Taskbar_UP_RadioButton.UseVisualStyleBackColor = true;
-            this.Taskbar_UP_RadioButton.CheckedChanged += new System.EventHandler(this.Taskbar_UP_RadioButton_CheckedChanged);
             // 
             // Customize_Taskbar_CheckBox
             // 
@@ -297,7 +273,7 @@
             // 
             // Activation_Button
             // 
-            this.Activation_Button.Location = new System.Drawing.Point(179, 228);
+            this.Activation_Button.Location = new System.Drawing.Point(177, 228);
             this.Activation_Button.Name = "Activation_Button";
             this.Activation_Button.Size = new System.Drawing.Size(160, 32);
             this.Activation_Button.TabIndex = 21;
@@ -307,7 +283,7 @@
             // 
             // Startup_Management_Button
             // 
-            this.Startup_Management_Button.Location = new System.Drawing.Point(12, 228);
+            this.Startup_Management_Button.Location = new System.Drawing.Point(10, 228);
             this.Startup_Management_Button.Name = "Startup_Management_Button";
             this.Startup_Management_Button.Size = new System.Drawing.Size(160, 32);
             this.Startup_Management_Button.TabIndex = 20;
@@ -317,7 +293,7 @@
             // 
             // Re_Explorer
             // 
-            this.Re_Explorer.Location = new System.Drawing.Point(12, 266);
+            this.Re_Explorer.Location = new System.Drawing.Point(10, 266);
             this.Re_Explorer.Name = "Re_Explorer";
             this.Re_Explorer.Size = new System.Drawing.Size(160, 32);
             this.Re_Explorer.TabIndex = 19;
@@ -327,7 +303,7 @@
             // 
             // Clear_Disktop_Icon_Cache_Button
             // 
-            this.Clear_Disktop_Icon_Cache_Button.Location = new System.Drawing.Point(179, 266);
+            this.Clear_Disktop_Icon_Cache_Button.Location = new System.Drawing.Point(177, 266);
             this.Clear_Disktop_Icon_Cache_Button.Name = "Clear_Disktop_Icon_Cache_Button";
             this.Clear_Disktop_Icon_Cache_Button.Size = new System.Drawing.Size(160, 32);
             this.Clear_Disktop_Icon_Cache_Button.TabIndex = 25;
@@ -337,7 +313,7 @@
             // 
             // Disclaimer_Button
             // 
-            this.Disclaimer_Button.Location = new System.Drawing.Point(345, 266);
+            this.Disclaimer_Button.Location = new System.Drawing.Point(344, 266);
             this.Disclaimer_Button.Name = "Disclaimer_Button";
             this.Disclaimer_Button.Size = new System.Drawing.Size(160, 32);
             this.Disclaimer_Button.TabIndex = 27;
@@ -345,14 +321,15 @@
             this.Disclaimer_Button.UseVisualStyleBackColor = true;
             this.Disclaimer_Button.Click += new System.EventHandler(this.Disclaimer_Button_Click);
             // 
-            // Right_ClickMenuManagement_Button
+            // Right_ClickMenu_Management_Button
             // 
-            this.Right_ClickMenuManagement_Button.Location = new System.Drawing.Point(345, 228);
-            this.Right_ClickMenuManagement_Button.Name = "Right_ClickMenuManagement_Button";
-            this.Right_ClickMenuManagement_Button.Size = new System.Drawing.Size(160, 32);
-            this.Right_ClickMenuManagement_Button.TabIndex = 26;
-            this.Right_ClickMenuManagement_Button.Text = "管理右键菜单";
-            this.Right_ClickMenuManagement_Button.UseVisualStyleBackColor = true;
+            this.Right_ClickMenu_Management_Button.Location = new System.Drawing.Point(344, 228);
+            this.Right_ClickMenu_Management_Button.Name = "Right_ClickMenu_Management_Button";
+            this.Right_ClickMenu_Management_Button.Size = new System.Drawing.Size(160, 32);
+            this.Right_ClickMenu_Management_Button.TabIndex = 26;
+            this.Right_ClickMenu_Management_Button.Text = "管理右键菜单";
+            this.Right_ClickMenu_Management_Button.UseVisualStyleBackColor = true;
+            this.Right_ClickMenu_Management_Button.Click += new System.EventHandler(this.Right_ClickMenu_Management_Button_Click);
             // 
             // Network_Settings_Button
             // 
@@ -364,14 +341,38 @@
             this.Network_Settings_Button.UseVisualStyleBackColor = true;
             this.Network_Settings_Button.Click += new System.EventHandler(this.Network_Settings_Button_Click);
             // 
+            // Disable_Open_File_Waring_CheckBox
+            // 
+            this.Disable_Open_File_Waring_CheckBox.AutoSize = true;
+            this.Disable_Open_File_Waring_CheckBox.Location = new System.Drawing.Point(13, 145);
+            this.Disable_Open_File_Waring_CheckBox.Name = "Disable_Open_File_Waring_CheckBox";
+            this.Disable_Open_File_Waring_CheckBox.Size = new System.Drawing.Size(168, 16);
+            this.Disable_Open_File_Waring_CheckBox.TabIndex = 19;
+            this.Disable_Open_File_Waring_CheckBox.Text = "关闭“打开文件安全警告”";
+            this.Disable_Open_File_Waring_CheckBox.UseVisualStyleBackColor = true;
+            this.Disable_Open_File_Waring_CheckBox.Visible = false;
+            this.Disable_Open_File_Waring_CheckBox.CheckedChanged += new System.EventHandler(this.Disable_Open_File_Waring_CheckBox_CheckedChanged);
+            // 
+            // Remove_Windows_Defender_CheckBox
+            // 
+            this.Remove_Windows_Defender_CheckBox.AutoSize = true;
+            this.Remove_Windows_Defender_CheckBox.Location = new System.Drawing.Point(13, 174);
+            this.Remove_Windows_Defender_CheckBox.Name = "Remove_Windows_Defender_CheckBox";
+            this.Remove_Windows_Defender_CheckBox.Size = new System.Drawing.Size(150, 16);
+            this.Remove_Windows_Defender_CheckBox.TabIndex = 26;
+            this.Remove_Windows_Defender_CheckBox.Text = "关闭 Windows Defender";
+            this.Remove_Windows_Defender_CheckBox.UseVisualStyleBackColor = true;
+            this.Remove_Windows_Defender_CheckBox.Visible = false;
+            this.Remove_Windows_Defender_CheckBox.CheckedChanged += new System.EventHandler(this.Remove_Windows_Defender_CheckBox_CheckedChanged);
+            // 
             // Main_Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(684, 306);
+            this.ClientSize = new System.Drawing.Size(684, 308);
             this.Controls.Add(this.Network_Settings_Button);
             this.Controls.Add(this.Disclaimer_Button);
-            this.Controls.Add(this.Right_ClickMenuManagement_Button);
+            this.Controls.Add(this.Right_ClickMenu_Management_Button);
             this.Controls.Add(this.Clear_Disktop_Icon_Cache_Button);
             this.Controls.Add(this.Github_Pages_Button);
             this.Controls.Add(this.System_GroupBox);
@@ -384,7 +385,7 @@
             this.MaximizeBox = false;
             this.Name = "Main_Window";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Windows 11 个性化工具";
+            this.Text = "Windows 11 个性化工具 - 暴雨版";
             this.Load += new System.EventHandler(this.Main_Window_Load);
             this.System_GroupBox.ResumeLayout(false);
             this.System_GroupBox.PerformLayout();
@@ -398,9 +399,7 @@
 
         private System.Windows.Forms.Button Github_Pages_Button;
         private System.Windows.Forms.GroupBox System_GroupBox;
-        private System.Windows.Forms.CheckBox Remove_Windows_Defender_CheckBox;
         private System.Windows.Forms.DateTimePicker DateTimePicker;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.CheckBox Disable_SmartScreen_CheckBox;
         private System.Windows.Forms.CheckBox Disable_UAC_CheckBox;
         private System.Windows.Forms.CheckBox Disable_Firewall_CheckBox;
@@ -421,8 +420,10 @@
         private System.Windows.Forms.Button Re_Explorer;
         private System.Windows.Forms.Button Clear_Disktop_Icon_Cache_Button;
         private System.Windows.Forms.Button Disclaimer_Button;
-        private System.Windows.Forms.Button Right_ClickMenuManagement_Button;
+        private System.Windows.Forms.Button Right_ClickMenu_Management_Button;
         private System.Windows.Forms.Button Network_Settings_Button;
+        private System.Windows.Forms.CheckBox Remove_Windows_Defender_CheckBox;
+        private System.Windows.Forms.CheckBox Disable_Open_File_Waring_CheckBox;
     }
 }
 

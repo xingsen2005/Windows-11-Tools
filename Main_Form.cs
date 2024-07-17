@@ -16,16 +16,20 @@ using System.IO;
 namespace Windows_Tools
 {
     public partial class Main_Window : Form
-    {
+    {        
         public Main_Window()
         {
             InitializeComponent();
+            Taskbar_UP_RadioButton.CheckedChanged += Taskbar_Position_Changed;
+            Taskbar_Down_RadioButton.CheckedChanged += Taskbar_Position_Changed;
+            Taskbar_Left_RadioButton.CheckedChanged += Taskbar_Position_Changed;
+            Taskbar_Right_RadioButton.CheckedChanged += Taskbar_Position_Changed;
         }
 
         private void Main_Window_Load(object sender, EventArgs e)
         {
-            // 取得系统信息并显示在标题上；
-            GetSystemProductName();
+            InstallGroupPolicy();
+            this.Text += " Build：" + Application.ProductVersion;
             // 最小日期设置为当前系统时间；
             DateTimePicker.MinDate = DateTime.Now;           
             // 查询系统是否联网；
@@ -57,10 +61,90 @@ namespace Windows_Tools
                 
             }            
         }
+        private void InstallGroupPolicy()
+        {
+            try
+            {
+                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion"))
+                {
+                    string editionId = (string)key.GetValue("EditionID");
+                    if (editionId == "Core")
+                    {
+                        DialogResult result = MessageBox.Show("当前系统为“家庭版”，没有“组策略编辑器”功能。现在安装吗？安装“组策略编辑器”可以实现更多的系统控制。", "安装组策略编辑器", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (result == DialogResult.Yes)
+                        {
+                            string currentDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+                            string windowsFolder = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                            string clientExtensionsPattern = Path.Combine(windowsFolder, @"servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~3*.mum");
+                            string clientToolsPattern = Path.Combine(windowsFolder, @"servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~3*.mum");
+
+                            List<string> packages = Directory.GetFiles(clientExtensionsPattern, "*.mum", SearchOption.TopDirectoryOnly)
+                                .Concat(Directory.GetFiles(clientToolsPattern, "*.mum", SearchOption.TopDirectoryOnly))
+                                .ToList();
+
+                            MessageBox.Show("组策略功能已安装，你可能需要重启计算机来应用修改。", "安装组策略包", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            if (packages.Count == 0)
+                            {
+                                MessageBox.Show("未找到组策略包。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            File.WriteAllLines(Path.Combine(currentDirectory, "List.txt"), packages);
+
+                            foreach (var package in packages)
+                            {
+                                if (!ExecuteDismCommand(package))
+                                {
+                                    MessageBox.Show("执行安装时遇到了意料之外的错误。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("无法读取注册表，错误：" + ex.Message, "错误");
+            }
+        }
+
+        static bool ExecuteDismCommand(string packagePath)
+        {
+            string dismCmd = $"dism /online /norestart /add-package \"{packagePath}\"";
+            ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", $"/c {dismCmd}")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using (Process process = new Process() { StartInfo = psi })
+            {
+                process.Start();
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+                if (process.ExitCode != 0)
+                {
+                    MessageBox.Show($"无法安装组策略包：{packagePath} 的安装命令无法执行。\n\n错误代码：{process.ExitCode}，输出为：" + output.Trim() + "，" + error.Trim(), "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);                    
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         // 取得系统版本
-        private void GetSystemProductName()
+        /*private void GetSystemProductName()
         {
+            string SystemVersion;
             string productNameKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
 
             // 获取系统架构信息
@@ -82,43 +166,19 @@ namespace Windows_Tools
             {
                 if (buildNumber >= 22000)
                 {
-                    this.Text += "   Build " + Application.ProductVersion + "  - 支持的版本：Windows 11 " + displayVersion + " " + architecture;
+                    SystemVersion = "Windows 11 " + displayVersion + " " + architecture;
                 }
                 else if (buildNumber >= 10240)
                 {
-                    this.Text += "   Build " + Application.ProductVersion + "  - 可能受限的版本：Windows 10 " + displayVersion + " " + architecture;
+                    SystemVersion = "Windows 10 " + displayVersion + " " + architecture;
                 }
                 else
                 {
                     Application.Exit();
                 }
-            }            
-        }
-
-        private bool ReadRegistryValues(string keyPath, out string currentBuild, out string displayVersion, string architecture)
-        {
-            currentBuild = "";
-            displayVersion = "";
-
-            try
-            {
-                using (RegistryKey key = GetRegistryKeyForArchitecture(architecture).OpenSubKey(keyPath))
-                {
-                    if (key != null)
-                    {
-                        currentBuild = key.GetValue("CurrentBuild") as string;
-                        displayVersion = key.GetValue("DisplayVersion") as string;
-                        return true;
-                    }
-                }
             }
-            catch (Exception ex)
-            {               
-                Console.WriteLine($"读取注册表时发生错误: {ex.Message}");
-            }
+        }*/
 
-            return false;
-        }
         // 重启资源管理器
         private void Restart_Explorer()
         {
@@ -166,12 +226,12 @@ namespace Windows_Tools
                 MessageBox.Show("清理图标缓存时出错: " + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private RegistryKey GetRegistryKeyForArchitecture(string architecture)
+        /*private RegistryKey GetRegistryKeyForArchitecture(string architecture)
         {
             return Environment.Is64BitOperatingSystem && architecture == "64 位"
                 ? RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 : RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
-        }
+        }*/
 
         private void Disable_ShortcutArrows_CheckBox_CheckedChanged(object sender, EventArgs e)
         {
@@ -280,13 +340,8 @@ namespace Windows_Tools
                 // 读取当前年月日。
                 string Now_Time = DateTime.Now.ToString("yyyy-MM-dd") + "T23:59:59Z";
                 // 计算当前计算机时间距离“DateTimePicker”所选时间之间的天数。
-                int Disable_Update_Days = (DateTime.Parse(Now_Time) - DateTime.Parse(Disable_Update_Time)).Days;
-                // Disable_Update_Days 的值不能是负数。
-                if (Disable_Update_Days < 0)
-                {
-                    MessageBox.Show("请选择一个有效的日期。", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                // 格式化时间，只考虑简体中文用户。
+                int Disable_Update_Days = (DateTime.Parse(Now_Time) - DateTime.Parse(Disable_Update_Time)).Days;                
+                // 格式化时间。
                 string Disable_Update_Time_Tips = DateTimePicker.Value.ToString("yyyy年MM月dd日");
                 // 判断系统位数，根据不同位数执行操作。
                 string RegistryPath = Environment.Is64BitOperatingSystem ? RegistryPath_64 : RegistryPath_32;
@@ -387,11 +442,12 @@ namespace Windows_Tools
 
         private void Startup_Management_Button_Click(object sender, EventArgs e)
         {
-            Startup_Management Startup_Management = new Startup_Management();
+            MessageBox.Show("此功能正在施工中……", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            /*Startup_Management Startup_Management = new Startup_Management();
             Startup_Management.Show();
             this.Enabled = false;
             Startup_Management.FormClosed += (s, ea) => { this.Enabled = true; };
-            Startup_Management.FormClosed += (s, ea) => { Startup_Management.Dispose(); };
+            Startup_Management.FormClosed += (s, ea) => { Startup_Management.Dispose(); };*/
         }
 
         private void Disable_SmartScreen_CheckBox_CheckedChanged(object sender, EventArgs e)
@@ -400,11 +456,11 @@ namespace Windows_Tools
             string System_SmartScreen_RegistryPath_64 = @"Software\Policies\Microsoft\Windows\System";
             string System_SmartScreen_RegistryPath_32 = @"Software\WoW6432Node\Policies\Microsoft\Windows\System";
             // 分别确定 64 位和 32 位的注册表路径（适用于 Microsoft Edeg 的 SmartScreen）。
-            string Edeg_SmartScreen_RegistryPath_64 = @"Software\Microsoft\Edge\SmartScreenEnabled";
-            string Edeg_SmartScreen_RegistryPath_32 = @"Software\WoW6432Node\Microsoft\Edge\SmartScreenEnabled";
+            /*string Edeg_SmartScreen_RegistryPath_64 = @"Software\Microsoft\Edge\SmartScreenEnabled";
+            string Edeg_SmartScreen_RegistryPath_32 = @"Software\WoW6432Node\Microsoft\Edge\SmartScreenEnabled";*/
             // 判断系统位数，根据不同位数执行操作。   
             string System_SmartScreen_RegistryPath = Environment.Is64BitOperatingSystem ? System_SmartScreen_RegistryPath_64 : System_SmartScreen_RegistryPath_32;
-            string Edeg_SmartScreen_RegistryPath = Environment.Is64BitOperatingSystem ? Edeg_SmartScreen_RegistryPath_64 : Edeg_SmartScreen_RegistryPath_32;
+            // string Edeg_SmartScreen_RegistryPath = Environment.Is64BitOperatingSystem ? Edeg_SmartScreen_RegistryPath_64 : Edeg_SmartScreen_RegistryPath_32;
             RegistryView RegistryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
             if (Disable_SmartScreen_CheckBox.Checked)
             {                           
@@ -414,10 +470,10 @@ namespace Windows_Tools
                     {
                         key.SetValue("EnableSmartScreen", 0, RegistryValueKind.DWord);
                     }
-                    using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView).OpenSubKey(Edeg_SmartScreen_RegistryPath, true))
+                    /*using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView).OpenSubKey(Edeg_SmartScreen_RegistryPath, true))
                     {
                         key.SetValue("Default", 1, RegistryValueKind.DWord);
-                    }
+                    }*/
                     MessageBox.Show("Windows 系统和 Edge 浏览器的 SmartScreen 功能已被禁用。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -433,10 +489,10 @@ namespace Windows_Tools
                     {
                         key.SetValue("EnableSmartScreen", 1, RegistryValueKind.DWord);
                     }
-                    using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView).OpenSubKey(Edeg_SmartScreen_RegistryPath, true))
+                    /*using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView).OpenSubKey(Edeg_SmartScreen_RegistryPath, true))
                     {
                         key.SetValue("Default", 0, RegistryValueKind.DWord);
-                    }
+                    }*/
                     MessageBox.Show("Windows 系统和 Edge 浏览器的 SmartScreen 功能已被重新打开。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -469,7 +525,7 @@ namespace Windows_Tools
 
         private void Disclaimer_Button_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("安全声明：本软件的部分操作可能导致系统崩溃，执行操作前请三思，并保证你拥有解决崩溃问题的经验；\n\n版权声明：本软件提供的激活功能仅供学习参考之用，因此作者同时也提供了源码。请勿将其用于商业用途，因此引发的一切法律纠纷均由你自己负责；", "免责声明", MessageBoxButtons.OK);
+            MessageBox.Show("安全声明：本软件的部分操作可能导致系统崩溃，执行操作前请三思，并保证你拥有解决崩溃问题的经验；\n\n版权声明：本软件提供的激活功能仅供学习参考之用，因此作者同时也提供了源码。请勿将其用于商业用途，因此引发的一切法律纠纷均由你自己负责；\n\n编译时间：2024/07/16", "免责声明", MessageBoxButtons.OK);
         }
 
         private void Clear_Disktop_Icon_Cache_Button_Click(object sender, EventArgs e)
@@ -490,46 +546,27 @@ namespace Windows_Tools
 
         private void Disable_Link_CheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // 定义不同位数的注册表路径；
             const string Shortcut_Suffix_RegistryPath_64 = @"Software\Microsoft\Windows\CurrentVersion\Explorer";
             const string Shortcut_Suffix_RegistryPath_32 = @"Software\WoW6432Node\Microsoft\Windows\CurrentVersion\Explorer";
-            // 根据系统位数选择视图；
             string RegistryPath = Environment.Is64BitOperatingSystem ? Shortcut_Suffix_RegistryPath_64 : Shortcut_Suffix_RegistryPath_32;
             RegistryView RegistryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
 
-            if (Disable_Link_CheckBox.Checked == true)
+            try
             {
-                try
+                byte[] valueBytes = Disable_Link_CheckBox.Checked
+                    ? new byte[] { 0x00, 0x00, 0x00, 0x00 }
+                    : new byte[] { 0x99, 0x00, 0x00, 0x00 };
+
+                using (RegistryKey Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView))
+                using (RegistryKey subKey = Key.CreateSubKey(RegistryPath, true))
                 {
-                    using (RegistryKey Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView))
-                    {
-                        using (RegistryKey subKey = Key.CreateSubKey(RegistryPath, true))
-                        {
-                            subKey.SetValue("link", "00 00 00 00", RegistryValueKind.Binary);
-                        }
-                    }
+                    subKey.SetValue("link", valueBytes, RegistryValueKind.Binary);
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"设置注册表值时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
+                Restart_Explorer();
+            }           
+            catch (Exception ex)
             {
-                try
-                {
-                    using (RegistryKey Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView))
-                    {
-                        using (RegistryKey subKey = Key.CreateSubKey(RegistryPath, true))
-                        {
-                            subKey.SetValue("link", "99 00 00 00", RegistryValueKind.Binary);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"设置注册表值时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                MessageBox.Show($"设置注册表值时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -539,47 +576,57 @@ namespace Windows_Tools
             Taskbar_UP_RadioButton.Enabled = Taskbar_Down_RadioButton.Enabled = Taskbar_Left_RadioButton.Enabled = Taskbar_Right_RadioButton.Enabled = isEnabled;
         }
 
+        private enum TaskbarPosition
+        {
+            Top = 983050,
+            Bottom = 983052,
+            Left = 983048,
+            Right = 983051
+        }
+
+        private void SetTaskbarPosition(TaskbarPosition position)
+        {
+            string baseValue = "30 00 00 00 FE FF FF 7A F4 00 00 ";
+            string endingValue = "00 00 00 30 00 00 00 30 00 00 00 00 00 00 00 08 04 00 00 80 07 00 00 38 04 00 00 60 00 00 00 01 00 00 00";
+            string value = $"{baseValue}{((int)position).ToString("X4")} {endingValue}";
+
+            SetTaskbarPositionInRegistry(value);
+            Restart_Explorer();
+        }
+
         private void SetTaskbarPositionInRegistry(string value)
         {
-            string Taskbar_Location_RegistryPath_64 = @"Software\Microsoft\Windows\CurrentVersion\Explorer";
-            string Taskbar_Location_RegistryPath_32 = @"Software\WoW6432Node\Microsoft\Windows\CurrentVersion\Explorer";
-            string RegistryPath = Environment.Is64BitOperatingSystem ? Taskbar_Location_RegistryPath_64 : Taskbar_Location_RegistryPath_32;
-            RegistryView RegistryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
-            try
+            string registryPath = Environment.Is64BitOperatingSystem
+                ? @"Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3"
+                : @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3";
+
+            using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser,Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32))
+            using (RegistryKey subKey = key.CreateSubKey(registryPath, true))
             {
-                using (RegistryKey Key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView))
-                using (RegistryKey subKey = Key.CreateSubKey(RegistryPath, true))
+                subKey.SetValue("Settings", ConvertHexToBinary(value), RegistryValueKind.Binary);
+            }
+        }
+
+        private byte[] ConvertHexToBinary(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
+        }
+        
+        private void Taskbar_Position_Changed(object sender, EventArgs e)
+        {
+            if (sender is RadioButton radioButton)
+            {
+                switch (radioButton.Name)
                 {
-                    subKey.SetValue("Settings", value, RegistryValueKind.Binary);
+                    case "Taskbar_UP_RadioButton": SetTaskbarPosition(TaskbarPosition.Top); break;
+                    case "Taskbar_Down_RadioButton": SetTaskbarPosition(TaskbarPosition.Bottom); break;
+                    case "Taskbar_Left_RadioButton": SetTaskbarPosition(TaskbarPosition.Left); break;
+                    case "Taskbar_Right_RadioButton": SetTaskbarPosition(TaskbarPosition.Right); break;
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"设置注册表值时出错：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void Taskbar_UP_RadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            SetTaskbarPositionInRegistry("30 00 00 00 FE FF FF 7A F4 00 00 01 00 00 00 30 00 00 00 30 00 00 00 00 00 00 00 08 04 00 00 80 07 00 00 38 04 00 00 60 00 00 00 01 00 00 00");
-            Restart_Explorer();
-        }
-
-        private void Taskbar_Down_RadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            SetTaskbarPositionInRegistry("30 00 00 00 FE FF FF 7A F4 00 00 03 00 00 00 30 00 00 00 30 00 00 00 00 00 00 00 08 04 00 00 80 07 00 00 38 04 00 00 60 00 00 00 01 00 00 00");
-            Restart_Explorer();
-        }
-
-        private void Taskbar_Left_RadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            SetTaskbarPositionInRegistry("30 00 00 00 FE FF FF 7A F4 00 00 00 00 00 00 30 00 00 00 30 00 00 00 00 00 00 00 08 04 00 00 80 07 00 00 38 04 00 00 60 00 00 00 01 00 00 00");
-            Restart_Explorer();
-        }
-
-        private void Taskbar_Right_RadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            SetTaskbarPositionInRegistry("30 00 00 00 FE FF FF 7A F4 00 00 02 00 00 00 30 00 00 00 30 00 00 00 00 00 00 00 08 04 00 00 80 07 00 00 38 04 00 00 60 00 00 00 01 00 00 00");
             Restart_Explorer();
         }
 
@@ -602,7 +649,8 @@ namespace Windows_Tools
                         key.SetValue("IsDynamicSearchBoxEnabled", 0, RegistryValueKind.DWord);
                         key.SetValue("IsMSACloudSearchEnabled", 0, RegistryValueKind.DWord);
                         key.SetValue("SafeSearchMode", 0, RegistryValueKind.DWord);
-                    }                   
+                    }
+                    Restart_Explorer();
                     MessageBox.Show("任务栏的所有搜索推荐均已被关闭。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -622,6 +670,7 @@ namespace Windows_Tools
                         key.SetValue("IsMSACloudSearchEnabled", 1, RegistryValueKind.DWord);
                         key.SetValue("SafeSearchMode", 1, RegistryValueKind.DWord);
                     }
+                    Restart_Explorer();
                     MessageBox.Show("任务栏的广告已被打开（想不通你为什么要这么做……）。", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
@@ -634,28 +683,23 @@ namespace Windows_Tools
         // 恢复为默认风格的右键菜单
         private void Restore_the_Context_Menu_CheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            // 分别确定 64 位和 32 位的注册表路径。
             string Restore_the_Context_Menu_RegistryPath_64 = @"Software\Classes\CLSID";
-            string Restore_the_Context_Menu_RegistryPath_32 = @"Software\WoW6432Node\Classes\CLSID";
-            // 判断系统位数，根据不同位数执行操作。   
+            string Restore_the_Context_Menu_RegistryPath_32 = @"Software\WoW6432Node\Classes\CLSID";           
             string Restore_the_Context_Menu_RegistryPath = Environment.Is64BitOperatingSystem ? Restore_the_Context_Menu_RegistryPath_64 : Restore_the_Context_Menu_RegistryPath_32;
             RegistryView RegistryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
             if (Restore_the_Context_Menu_CheckBox.Checked == true)
             {
                 try
-                {
-                    if (Registry.GetValue(Restore_the_Context_Menu_RegistryPath, "{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", null) == null)
+                {                    
+                    using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView).CreateSubKey(Restore_the_Context_Menu_RegistryPath, true))
                     {
-                        using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView).OpenSubKey(Restore_the_Context_Menu_RegistryPath, true))
+                        using (RegistryKey key2 = key.CreateSubKey("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", true))
                         {
-                            key.CreateSubKey("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
-                        }
-                        using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView).OpenSubKey(Restore_the_Context_Menu_RegistryPath + "\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", true))
-                        {
-                            key.CreateSubKey("InprocServer32");
+                            key2.CreateSubKey("InprocServer32", true);
                         }
                         Restart_Explorer();
                     }
+
                 }
                 catch (Exception ex)
                 {
@@ -668,11 +712,7 @@ namespace Windows_Tools
                 {
                     using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView).OpenSubKey(Restore_the_Context_Menu_RegistryPath, true))
                     {
-                        key.DeleteSubKey("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
-                    }
-                    using (RegistryKey key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView).OpenSubKey(Restore_the_Context_Menu_RegistryPath + "\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", true))
-                    {
-                        key.DeleteSubKey("InprocServer32");
+                        key.DeleteSubKeyTree("{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}");
                     }
                     Restart_Explorer();
                 }
@@ -681,6 +721,35 @@ namespace Windows_Tools
                     MessageBox.Show("发生错误：" + ex.Message);
                 }
             }
+        }
+
+        private void Right_ClickMenu_Management_Button_Click(object sender, EventArgs e)
+        {
+            /*Right_ClickMenu_Management Right_ClickMenu_Management = new Right_ClickMenu_Management();
+            Right_ClickMenu_Management.Show();
+            this.Enabled = false;   
+            Right_ClickMenu_Management.FormClosed += (s, ea) => { this.Enabled = true; };
+            Right_ClickMenu_Management.FormClosed += (s, ea) => { Right_ClickMenu_Management.Dispose(); };*/
+            MessageBox.Show("此功能正在施工中……", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void Disable_Open_File_Waring_CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Remove_Windows_Defender_CheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            /*if (Remove_Windows_Defender_CheckBox.Checked == true)
+            {
+                if (MessageBox.Show("关闭 Windows Defender 可能会导致某些不可预知的问题，确定吗？", "关闭 Windows Defender", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                {
+                }
+                else
+                {
+                    return;
+                }
+            }*/
         }
     }
 }

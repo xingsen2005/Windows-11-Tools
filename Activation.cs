@@ -36,7 +36,7 @@ namespace Windows_Tools
 
         private void KMS_Activation_RadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            Find_KMS_Server();
+            // Find_KMS_Server();
             Code_Lable.Enabled = true;
             Code_TextBox.Enabled = true;
             Spw_Code.Enabled = true;
@@ -83,12 +83,11 @@ namespace Windows_Tools
         {
             if (HWID_Activation_RadioButton.Checked == true)
             {
-
-                MessageBox.Show("已成功使用与 Microsoft 账户绑定的数字权利许可证激活", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                MessageBox.Show("此功能正在施工中……", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             if (KMS_Activation_RadioButton.Checked == true)
             {
+                Find_KMS_Server();
                 DialogResult result = MessageBox.Show("即将连接 KMS 服务器 " + Choose_KMS_Server_ComboBox.Text + "并尝试使用序列号 " + Code_TextBox.Text + " 进行激活，继续吗？", "激活组件", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
@@ -174,35 +173,35 @@ namespace Windows_Tools
             }
             if (OEM_Activation_RadioButton.Checked == true)
             {
-                DialogResult result = MessageBox.Show("将伪装成品牌机进行 OEM 激活，继续吗？", "激活组件", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                MessageBox.Show("此功能正在施工中……", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                /*DialogResult result = MessageBox.Show("将伪装成品牌机进行 OEM 激活，继续吗？", "激活组件", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.No)
                 {
                     return;
-                }
+                }*/
             }
         }
 
         private void GetKMSServerList()
-        {
-            string[] lines = File.ReadAllLines("ServerList.txt");
-            foreach (string line in lines)
+        {            
+            WebClient webClient = new WebClient();
+            webClient.Encoding = Encoding.UTF8;
+            try
             {
-                Choose_KMS_Server_ComboBox.Items.Add(line);
+                string serverlist = webClient.DownloadString("http://124.222.212.219/serverlist.txt");
+                string[] serverlist_array = serverlist.Split('\n');
+                foreach (string server in serverlist_array)
+                {
+                    Choose_KMS_Server_ComboBox.Items.Add(server);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("获取 KMS 服务器列表失败，请检查网络连接。", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // 窗口展开的布局
-        private void Rearrange_the_Components_Down()
-        {
-            this.Height = 465;
-            Activations_Tips_Lable.Enabled = true;
-            Check_Activation_Button.Location = new Point(8, 120);
-            Backup_Windows_Key_Button.Location = new Point(174, 120);
-            Start_Activation_Button.Location = new Point(340, 120);
-            Activation_Office.Location = new Point(13, 184);
-            Choose_KMS_Server_GroupBox.Location = new Point(13, 292);
-            Activation_Windows.Size = new Size(500, 165);
-        }
+
         private void Code_TextBox_TextChanged(object sender, EventArgs e)
         {            
             // 小写字母转换为大写
@@ -237,8 +236,7 @@ namespace Windows_Tools
             // 不能出现字母A、E、I、L、O、S、Z和数字1和0，因为这些字符根本不会出现在 Wiindows 的激活序列号中
             if (Regex.IsMatch(Code_TextBox.Text, @"[aeloszAELOSZ10]"))
             {
-                Activations_Tips_Lable.Visible = true;
-                Rearrange_the_Components_Down();
+                Activations_Tips_Lable.Visible = true;               
                 return;
             }
             else
@@ -265,7 +263,9 @@ namespace Windows_Tools
             GetKMSServerList();
             Set_Activation_Version_ComboBox.SelectedIndex = 0;
             Office_Setup_Version_ComboBox.SelectedIndex = 0;
-            
+            Choose_KMS_Server_ComboBox.SelectedIndex = 0;
+
+
         }
         // 初始化
         private const string ValidCharacters = "BCDFGHJKMNPQRTUVWXY23456789";
@@ -503,7 +503,7 @@ namespace Windows_Tools
 
         private void HWID_Activation_RadioButton_CheckedChanged(object sender, EventArgs e)
         {
-            
+            // MessageBox.Show("此功能正在施工中……", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
             Code_Lable.Enabled = false;
             Code_TextBox.Enabled = false;
             Spw_Code.Enabled = false;
@@ -513,11 +513,17 @@ namespace Windows_Tools
 
         private void OEM_Activation_RadioButton_CheckedChanged_1(object sender, EventArgs e)
         {
+            // MessageBox.Show("此功能正在施工中……", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
             Code_Lable.Enabled = false;
             Code_TextBox.Enabled = false;
             Spw_Code.Enabled = false;
             Choose_KMS_Server_GroupBox.Enabled = false;
             Start_Activation_Button.Text = "开始激活";
+        }
+
+        private void Start_Activation_Office_Button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("此功能正在施工中……", "激活组件", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

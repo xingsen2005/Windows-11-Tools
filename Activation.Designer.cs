@@ -48,7 +48,7 @@
             this.OEM_Activation_RadioButton = new System.Windows.Forms.RadioButton();
             this.KMS_Activation_RadioButton = new System.Windows.Forms.RadioButton();
             this.HWID_Activation_RadioButton = new System.Windows.Forms.RadioButton();
-            this.button1 = new System.Windows.Forms.Button();
+            this.Start_Activation_Office_Button = new System.Windows.Forms.Button();
             this.Activation_Office = new System.Windows.Forms.GroupBox();
             this.Backup_Office_Key_Button = new System.Windows.Forms.Button();
             this.Office_Setup_Version_ComboBox = new System.Windows.Forms.ComboBox();
@@ -121,9 +121,9 @@
             this.KMS_Tips_Label.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(192)))));
             this.KMS_Tips_Label.Location = new System.Drawing.Point(11, 93);
             this.KMS_Tips_Label.Name = "KMS_Tips_Label";
-            this.KMS_Tips_Label.Size = new System.Drawing.Size(395, 12);
+            this.KMS_Tips_Label.Size = new System.Drawing.Size(455, 12);
             this.KMS_Tips_Label.TabIndex = 11;
-            this.KMS_Tips_Label.Text = "软件会自动寻找可用的 KMS 服务器，因此除非特殊需求，不必自行选择。";
+            this.KMS_Tips_Label.Text = "软件会自动寻找可用且延时最低的 KMS 服务器，因此除非特殊需求，不必自行选择。";
             // 
             // Get_Ping_Button
             // 
@@ -280,21 +280,22 @@
             this.HWID_Activation_RadioButton.UseVisualStyleBackColor = true;
             this.HWID_Activation_RadioButton.CheckedChanged += new System.EventHandler(this.HWID_Activation_RadioButton_CheckedChanged);
             // 
-            // button1
+            // Start_Activation_Office_Button
             // 
-            this.button1.Location = new System.Drawing.Point(340, 54);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(150, 32);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "开始激活";
-            this.button1.UseVisualStyleBackColor = true;
+            this.Start_Activation_Office_Button.Location = new System.Drawing.Point(340, 54);
+            this.Start_Activation_Office_Button.Name = "Start_Activation_Office_Button";
+            this.Start_Activation_Office_Button.Size = new System.Drawing.Size(150, 32);
+            this.Start_Activation_Office_Button.TabIndex = 5;
+            this.Start_Activation_Office_Button.Text = "开始激活";
+            this.Start_Activation_Office_Button.UseVisualStyleBackColor = true;
+            this.Start_Activation_Office_Button.Click += new System.EventHandler(this.Start_Activation_Office_Button_Click);
             // 
             // Activation_Office
             // 
             this.Activation_Office.Controls.Add(this.Backup_Office_Key_Button);
             this.Activation_Office.Controls.Add(this.Office_Setup_Version_ComboBox);
             this.Activation_Office.Controls.Add(this.Office_Setup_Version_Label);
-            this.Activation_Office.Controls.Add(this.button1);
+            this.Activation_Office.Controls.Add(this.Start_Activation_Office_Button);
             this.Activation_Office.Location = new System.Drawing.Point(13, 160);
             this.Activation_Office.Name = "Activation_Office";
             this.Activation_Office.Size = new System.Drawing.Size(500, 100);
@@ -377,7 +378,7 @@
         private System.Windows.Forms.RadioButton OEM_Activation_RadioButton;
         private System.Windows.Forms.RadioButton KMS_Activation_RadioButton;
         private System.Windows.Forms.RadioButton HWID_Activation_RadioButton;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button Start_Activation_Office_Button;
         private System.Windows.Forms.GroupBox Activation_Office;
         private System.Windows.Forms.Button Backup_Office_Key_Button;
         private System.Windows.Forms.ComboBox Office_Setup_Version_ComboBox;

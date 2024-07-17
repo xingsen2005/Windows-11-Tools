@@ -36,7 +36,15 @@
             this.Restore_the_Default_Button = new System.Windows.Forms.Button();
             this.MAC_Add_TextBox = new System.Windows.Forms.TextBox();
             this.MAC_Add_Label = new System.Windows.Forms.Label();
+            this.NetworkInfo_GroupBox = new System.Windows.Forms.GroupBox();
+            this.Changer_Button = new System.Windows.Forms.Button();
+            this.Alternate_DNS_Label = new System.Windows.Forms.Label();
+            this.Preferred_DNS_Label = new System.Windows.Forms.Label();
+            this.Local_IP_Label = new System.Windows.Forms.Label();
+            this.NetworkIP_Label = new System.Windows.Forms.Label();
+            this.Operators_Label = new System.Windows.Forms.Label();
             this.Set_MAC_GroupBox.SuspendLayout();
+            this.NetworkInfo_GroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // Set_MAC_GroupBox
@@ -47,7 +55,7 @@
             this.Set_MAC_GroupBox.Controls.Add(this.Restore_the_Default_Button);
             this.Set_MAC_GroupBox.Controls.Add(this.MAC_Add_TextBox);
             this.Set_MAC_GroupBox.Controls.Add(this.MAC_Add_Label);
-            this.Set_MAC_GroupBox.Location = new System.Drawing.Point(13, 13);
+            this.Set_MAC_GroupBox.Location = new System.Drawing.Point(12, 12);
             this.Set_MAC_GroupBox.Name = "Set_MAC_GroupBox";
             this.Set_MAC_GroupBox.Size = new System.Drawing.Size(440, 100);
             this.Set_MAC_GroupBox.TabIndex = 0;
@@ -109,11 +117,81 @@
             this.MAC_Add_Label.TabIndex = 0;
             this.MAC_Add_Label.Text = "设置 MAC 地址为：";
             // 
+            // NetworkInfo_GroupBox
+            // 
+            this.NetworkInfo_GroupBox.Controls.Add(this.Changer_Button);
+            this.NetworkInfo_GroupBox.Controls.Add(this.Alternate_DNS_Label);
+            this.NetworkInfo_GroupBox.Controls.Add(this.Preferred_DNS_Label);
+            this.NetworkInfo_GroupBox.Controls.Add(this.Local_IP_Label);
+            this.NetworkInfo_GroupBox.Controls.Add(this.NetworkIP_Label);
+            this.NetworkInfo_GroupBox.Controls.Add(this.Operators_Label);
+            this.NetworkInfo_GroupBox.Location = new System.Drawing.Point(12, 118);
+            this.NetworkInfo_GroupBox.Name = "NetworkInfo_GroupBox";
+            this.NetworkInfo_GroupBox.Size = new System.Drawing.Size(439, 210);
+            this.NetworkInfo_GroupBox.TabIndex = 1;
+            this.NetworkInfo_GroupBox.TabStop = false;
+            this.NetworkInfo_GroupBox.Text = "网络信息";
+            // 
+            // Changer_Button
+            // 
+            this.Changer_Button.Location = new System.Drawing.Point(354, 171);
+            this.Changer_Button.Name = "Changer_Button";
+            this.Changer_Button.Size = new System.Drawing.Size(75, 23);
+            this.Changer_Button.TabIndex = 6;
+            this.Changer_Button.Text = "修改设置";
+            this.Changer_Button.UseVisualStyleBackColor = true;
+            // 
+            // Alternate_DNS_Label
+            // 
+            this.Alternate_DNS_Label.AutoSize = true;
+            this.Alternate_DNS_Label.Location = new System.Drawing.Point(12, 145);
+            this.Alternate_DNS_Label.Name = "Alternate_DNS_Label";
+            this.Alternate_DNS_Label.Size = new System.Drawing.Size(41, 12);
+            this.Alternate_DNS_Label.TabIndex = 4;
+            this.Alternate_DNS_Label.Text = "label2";
+            // 
+            // Preferred_DNS_Label
+            // 
+            this.Preferred_DNS_Label.AutoSize = true;
+            this.Preferred_DNS_Label.Location = new System.Drawing.Point(12, 116);
+            this.Preferred_DNS_Label.Name = "Preferred_DNS_Label";
+            this.Preferred_DNS_Label.Size = new System.Drawing.Size(41, 12);
+            this.Preferred_DNS_Label.TabIndex = 3;
+            this.Preferred_DNS_Label.Text = "label1";
+            // 
+            // Local_IP_Label
+            // 
+            this.Local_IP_Label.AutoSize = true;
+            this.Local_IP_Label.Location = new System.Drawing.Point(12, 87);
+            this.Local_IP_Label.Name = "Local_IP_Label";
+            this.Local_IP_Label.Size = new System.Drawing.Size(41, 12);
+            this.Local_IP_Label.TabIndex = 2;
+            this.Local_IP_Label.Text = "label1";
+            // 
+            // NetworkIP_Label
+            // 
+            this.NetworkIP_Label.AutoSize = true;
+            this.NetworkIP_Label.Location = new System.Drawing.Point(12, 58);
+            this.NetworkIP_Label.Name = "NetworkIP_Label";
+            this.NetworkIP_Label.Size = new System.Drawing.Size(41, 12);
+            this.NetworkIP_Label.TabIndex = 1;
+            this.NetworkIP_Label.Text = "label1";
+            // 
+            // Operators_Label
+            // 
+            this.Operators_Label.AutoSize = true;
+            this.Operators_Label.Location = new System.Drawing.Point(12, 29);
+            this.Operators_Label.Name = "Operators_Label";
+            this.Operators_Label.Size = new System.Drawing.Size(35, 12);
+            this.Operators_Label.TabIndex = 0;
+            this.Operators_Label.Text = "Label";
+            // 
             // Network_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(464, 121);
+            this.Controls.Add(this.NetworkInfo_GroupBox);
             this.Controls.Add(this.Set_MAC_GroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -121,9 +199,10 @@
             this.Name = "Network_Settings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "网络设置";
-            this.Load += new System.EventHandler(this.Network_Settings_Load);
             this.Set_MAC_GroupBox.ResumeLayout(false);
             this.Set_MAC_GroupBox.PerformLayout();
+            this.NetworkInfo_GroupBox.ResumeLayout(false);
+            this.NetworkInfo_GroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -137,5 +216,12 @@
         private System.Windows.Forms.ComboBox Select_NIC_ComboBox;
         private System.Windows.Forms.Label Select_NIC_Label;
         private System.Windows.Forms.Button Save_Button;
+        private System.Windows.Forms.GroupBox NetworkInfo_GroupBox;
+        private System.Windows.Forms.Label Operators_Label;
+        private System.Windows.Forms.Label NetworkIP_Label;
+        private System.Windows.Forms.Label Local_IP_Label;
+        private System.Windows.Forms.Label Alternate_DNS_Label;
+        private System.Windows.Forms.Label Preferred_DNS_Label;
+        private System.Windows.Forms.Button Changer_Button;
     }
 }
